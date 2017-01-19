@@ -5,14 +5,13 @@ import (
 	"os"
 	"path/filepath"
 	"plugin"
-	"regexp"
 )
 
 func main() {
-	pluginPaths := getPlugins()
+	pluginPaths := getPluginPaths()
 	var plugins []*plugin.Plugin
 	for _, path := range pluginPaths {
-		p, err := plugin.Open("plugins/" + path)
+		p, err := plugin.Open(path)
 		if err != nil {
 			panic(err)
 		}
@@ -46,20 +45,19 @@ func findPlugin(plugins []*plugin.Plugin, name string) func(int, int) int {
 	return nil
 }
 
-func getPlugins() []string {
+func getPluginPaths() []string {
 	cwd, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
+
 	var files []string
 	filepath.Walk(cwd, func(path string, f os.FileInfo, _ error) error {
-		if !f.IsDir() {
-			r, err := regexp.MatchString(".so", f.Name())
-			if err == nil && r {
-				files = append(files, f.Name())
-			}
+		if !f.IsDir() && filepath.Ext(f.Name()) == ".so" {
+			files = append(files, path)
 		}
 		return nil
 	})
+
 	return files
 }
