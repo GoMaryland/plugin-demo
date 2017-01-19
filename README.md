@@ -8,3 +8,5 @@ go build --buildmode=plugin -o subtract.so subtract.go
 ```
 
 Then, go to the main directory and run `go build` and `./plugin-demo`
+
+**Note:** This requires Linux and Go 1.8
